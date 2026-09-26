@@ -4,7 +4,10 @@ pipeline {
     stages {
         stage('Build') {
             agent {
-                docker { image 'node:16'; args '-u root' }
+                docker {
+                    image 'node:16-alpine'
+                    args '-u root'
+                }
             }
             steps {
                 echo 'Installing dependencies...'
@@ -14,7 +17,10 @@ pipeline {
 
         stage('Test') {
             agent {
-                docker { image 'node:16'; args '-u root' }
+                docker {
+                    image 'node:16-alpine'
+                    args '-u root'
+                }
             }
             steps {
                 echo 'Running checks...'
@@ -32,7 +38,7 @@ pipeline {
         stage('Security Scan') {
             steps {
                 echo 'Scanning for vulnerabilities...'
-                sh ' trivy image --severity HIGH,CRITICAL --exit-code 1 enosh0606/node-app:latest'
+                sh 'trivy image --severity HIGH,CRITICAL --exit-code 1 enosh0606/node-app:latest'
             }
         }
 
