@@ -32,7 +32,7 @@ pipeline {
         stage('Security Scan') {
             steps {
                 echo 'Scanning for vulnerabilities...'
-                sh 'trivy image enosh0606/node-app:latest || echo "Trivy not installed - skipping"'
+                sh ' trivy image --severity HIGH,CRITICAL --exit-code 1 enosh0606/node-app:latest'
             }
         }
 
