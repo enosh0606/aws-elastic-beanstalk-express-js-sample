@@ -1,13 +1,11 @@
 pipeline {
-    agent {
-        docker {
-            image 'node:16'
-            args '-u root'
-        }
-    }
+    agent any
 
     stages {
         stage('Build') {
+            agent {
+                docker { image 'node:16'; args '-u root' }
+            }
             steps {
                 echo 'Installing dependencies...'
                 sh 'npm install'
@@ -15,6 +13,9 @@ pipeline {
         }
 
         stage('Test') {
+            agent {
+                docker { image 'node:16'; args '-u root' }
+            }
             steps {
                 echo 'Running checks...'
                 sh 'npm run lint || echo "No lint script - skipping"'
