@@ -31,7 +31,7 @@ pipeline {
         stage('Docker Build') {
             steps {
                 echo 'Building Docker image...'
-                sh 'docker build -t enosh0606/node-app:latest .'
+                sh 'docker build -t 23525609/node-app:latest .'
             }
         }
 
