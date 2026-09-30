@@ -36,15 +36,19 @@ pipeline {
         }
 
         stage('Security Scan') {
-    steps {
-        echo 'Scanning for vulnerabilities...'
-        sh 'trivy image --severity HIGH,CRITICAL enosh0606/node-app:latest || true'
-    }
-}
-
-        stage('Push') {
             steps {
-                echo 'Push stage - will be set up later'
+                echo 'Scanning for vulnerabilities...'
+                sh 'trivy image --severity HIGH,CRITICAL 23525609/node-app:latest || true'
+            }
+        }
+
+        stage('Push to Docker Hub') {
+            steps {
+                echo 'Pushing to Docker Hub...'
+                withCredentials([usernamePassword(credentialsId: 'docker-hub', usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) {
+                    sh 'echo $DOCKER_PASS | docker login -u $DOCKER_USER --password-stdin'
+                    sh 'docker push 23525609/node-app:latest'
+                }
             }
         }
     }
