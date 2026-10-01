@@ -24,7 +24,7 @@ pipeline {
             }
             steps {
                 echo 'Running checks...'
-                sh 'npm run lint || echo "No lint script - skipping"'
+                sh 'npm test'
             }
         }
 
@@ -38,7 +38,7 @@ pipeline {
         stage('Security Scan') {
             steps {
                 echo 'Scanning for vulnerabilities...'
-                sh 'trivy image --severity HIGH,CRITICAL 23525609/node-app:latest || true'
+                sh 'trivy image --exit-code 1 --severity HIGH,CRITICAL 23525609/node-app:latest'
             }
         }
 
