@@ -1,44 +1,12 @@
 pipeline {
     agent any
 
-    stages {
-        stage('Build') {
-            agent {
-                docker {
-                    image 'node:16-alpine'
-                    args '-u root'
-                }
-            }
-            steps {
-                echo 'Installing dependencies...'
-                sh 'npm install'
-            }
-        }
-
-        stage('Test') {
-            agent {
-                docker {
-                    image 'node:16-alpine'
-                    args '-u root'
-                }
-            }
-            steps {
-                echo 'Running checks...'
-                sh 'npm test'
-            }
-        }
-
-        stage('Docker Build') {
-pipeline {
-    agent any
-
     options {
         buildDiscarder(logRotator(numToKeepStr: '10'))
         timestamps()
     }
 
     stages {
-
         stage('Install Dependencies') {
             agent {
                 docker {
@@ -76,9 +44,8 @@ pipeline {
 
         stage('Security Scan') {
             steps {
-                echo 'Scanning application dependencies for vulnerabilities...'
+                echo 'Scanning application dependencies...'
 
-                // Save a Trivy report for Jenkins artifacts
                 sh '''
                     trivy fs \
                     --scanners vuln \
@@ -88,7 +55,6 @@ pipeline {
                     .
                 '''
 
-                // Fail pipeline if High or Critical vulnerabilities are found
                 sh '''
                     trivy fs \
                     --scanners vuln \
@@ -110,17 +76,13 @@ pipeline {
                         passwordVariable: 'DOCKER_PASS'
                     )
                 ]) {
-
                     sh '''
                         echo "$DOCKER_PASS" | docker login \
                         -u "$DOCKER_USER" \
                         --password-stdin
 
-                        docker tag node-app:${BUILD_NUMBER} \
-                        "$DOCKER_USER/node-app:${BUILD_NUMBER}"
-
-                        docker tag node-app:${BUILD_NUMBER} \
-                        "$DOCKER_USER/node-app:latest"
+                        docker tag node-app:${BUILD_NUMBER} "$DOCKER_USER/node-app:${BUILD_NUMBER}"
+                        docker tag node-app:${BUILD_NUMBER} "$DOCKER_USER/node-app:latest"
 
                         docker push "$DOCKER_USER/node-app:${BUILD_NUMBER}"
                         docker push "$DOCKER_USER/node-app:latest"
@@ -142,7 +104,7 @@ pipeline {
         }
 
         failure {
-            echo 'Pipeline failed. Check the stage logs for details.'
+            echo 'Pipeline failed. Check the stage logs.'
         }
     }
 }
